@@ -1,6 +1,7 @@
 import type { Config } from '@react-native-community/cli-types';
 import webpack, { type Configuration } from 'webpack';
 import { VERBOSE_ENV_KEY } from '../../env.js';
+import { exitWithError } from '../common/exit.js';
 import {
   getEnvOptions,
   getWebpackConfigFilePath,
@@ -9,7 +10,6 @@ import {
   writeStats,
 } from '../common/index.js';
 import type { BundleArguments, BundleCliOptions } from '../types.js';
-import { exitWithError } from '../common/exit.js';
 
 /**
  * Bundle command for React Native Community CLI.

@@ -7,6 +7,7 @@ import type { SendProgress } from '@callstack/repack-dev-server';
 import type webpack from 'webpack';
 import { WORKER_ENV_KEY } from '../../env.js';
 import type { LogType, Reporter } from '../../logging/types.js';
+import { exitWithError } from '../common/exit.js';
 import { DEV_SERVER_ASSET_TYPES } from '../consts.js';
 import type { CliOptions } from '../types.js';
 import type {
@@ -14,7 +15,6 @@ import type {
   WebpackWorkerOptions,
   WorkerMessages,
 } from './types.js';
-import { exitWithError } from '../common/exit.js';
 
 type Platform = string;
 

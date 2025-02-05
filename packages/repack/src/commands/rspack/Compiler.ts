@@ -11,6 +11,7 @@ import type {
 import memfs from 'memfs';
 import type { Reporter } from '../../logging/types.js';
 import type { HMRMessageBody } from '../../types.js';
+import { exitWithError } from '../common/exit.js';
 import {
   adaptFilenameToPlatform,
   getEnvOptions,
@@ -20,7 +21,6 @@ import {
 import { DEV_SERVER_ASSET_TYPES } from '../consts.js';
 import type { StartCliOptions } from '../types.js';
 import type { CompilerAsset, MultiWatching } from './types.js';
-import { exitWithError } from '../common/exit.js';
 
 export class Compiler {
   platforms: string[];

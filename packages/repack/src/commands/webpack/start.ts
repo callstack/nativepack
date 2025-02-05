@@ -12,6 +12,7 @@ import {
   composeReporters,
   makeLogEntryFromFastifyLog,
 } from '../../logging/index.js';
+import { exitWithError } from '../common/exit.js';
 import {
   getMimeType,
   getWebpackConfigFilePath,
@@ -23,7 +24,6 @@ import { DEFAULT_HOSTNAME, DEFAULT_PORT } from '../consts.js';
 import type { StartArguments, StartCliOptions } from '../types.js';
 import { Compiler } from './Compiler.js';
 import type { HMRMessageBody } from './types.js';
-import { exitWithError } from '../common/exit.js';
 
 /**
  * Start command for React Native Community CLI.
