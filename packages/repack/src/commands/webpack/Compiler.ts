@@ -14,6 +14,7 @@ import type {
   WebpackWorkerOptions,
   WorkerMessages,
 } from './types.js';
+import { exitWithError } from '../common/exit.js';
 
 type Platform = string;
 
@@ -212,7 +213,7 @@ export class Compiler extends EventEmitter {
   ): Promise<string | Buffer> {
     if (DEV_SERVER_ASSET_TYPES.test(filename)) {
       if (!platform) {
-        throw new Error(`Cannot detect platform for ${filename}`);
+        exitWithError(`Cannot detect platform for ${filename}`);
       }
       const asset = await this.getAsset(filename, platform, sendProgress);
       return asset.data;
@@ -223,7 +224,7 @@ export class Compiler extends EventEmitter {
       const source = await fs.promises.readFile(filePath, 'utf8');
       return source;
     } catch {
-      throw new Error(`File ${filename} not found`);
+      exitWithError(`File ${filename} not found`);
     }
   }
 
@@ -232,9 +233,7 @@ export class Compiler extends EventEmitter {
     platform: string | undefined
   ): Promise<string | Buffer> {
     if (!platform) {
-      throw new Error(
-        `Cannot determine platform for source map of ${filename}`
-      );
+      exitWithError(`Cannot determine platform for source map of ${filename}`);
     }
 
     try {
@@ -242,7 +241,7 @@ export class Compiler extends EventEmitter {
       let sourceMapFilename = info.related?.sourceMap;
 
       if (!sourceMapFilename) {
-        throw new Error(
+        exitWithError(
           `Cannot determine source map filename for ${filename} for ${platform}`
         );
       }
@@ -254,7 +253,7 @@ export class Compiler extends EventEmitter {
       const sourceMap = await this.getAsset(sourceMapFilename, platform);
       return sourceMap.data;
     } catch {
-      throw new Error(`Source map for ${filename} for ${platform} is missing`);
+      exitWithError(`Source map for ${filename} for ${platform} is missing`);
     }
   }
 }

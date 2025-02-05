@@ -9,6 +9,7 @@ import {
   writeStats,
 } from '../common/index.js';
 import type { BundleArguments, BundleCliOptions } from '../types.js';
+import { exitWithError } from '../common/exit.js';
 
 /**
  * Bundle command for React Native Community CLI.
@@ -44,7 +45,7 @@ export async function bundle(
   };
 
   if (!args.entryFile) {
-    throw new Error("Option '--entry-file <path>' argument is missing");
+    exitWithError("Option '--entry-file <path>' argument is missing");
   }
 
   if (args.verbose) {
@@ -59,8 +60,7 @@ export async function bundle(
 
   const errorHandler = async (error: Error | null, stats?: webpack.Stats) => {
     if (error) {
-      console.error(error);
-      process.exit(2);
+      exitWithError(String(error));
     }
 
     if (stats?.hasErrors()) {
@@ -83,8 +83,7 @@ export async function bundle(
           rootDir: compiler.context,
         });
       } catch (e) {
-        console.error(String(e));
-        process.exit(2);
+        exitWithError(String(e));
       }
     }
   };

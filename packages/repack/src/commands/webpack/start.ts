@@ -23,6 +23,7 @@ import { DEFAULT_HOSTNAME, DEFAULT_PORT } from '../consts.js';
 import type { StartArguments, StartCliOptions } from '../types.js';
 import { Compiler } from './Compiler.js';
 import type { HMRMessageBody } from './types.js';
+import { exitWithError } from '../common/exit.js';
 
 /**
  * Start command for React Native Community CLI.
@@ -63,7 +64,7 @@ export async function start(_: string[], config: Config, args: StartArguments) {
   };
 
   if (args.platform && !cliOptions.config.platforms.includes(args.platform)) {
-    throw new Error('Unrecognized platform: ' + args.platform);
+    exitWithError('Unrecognized platform: ' + args.platform);
   }
 
   if (args.verbose) {

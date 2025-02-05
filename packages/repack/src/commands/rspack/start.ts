@@ -19,6 +19,7 @@ import {
 import { DEFAULT_HOSTNAME, DEFAULT_PORT } from '../consts.js';
 import type { StartArguments, StartCliOptions } from '../types.js';
 import { Compiler } from './Compiler.js';
+import { exitWithError } from '../common/exit.js';
 
 /**
  * Start command for React Native Community CLI.
@@ -63,7 +64,7 @@ export async function start(
   };
 
   if (args.platform && !cliOptions.config.platforms.includes(args.platform)) {
-    throw new Error('Unrecognized platform: ' + args.platform);
+    exitWithError('Unrecognized platform: ' + args.platform + '. Supported platforms: ' + cliOptions.config.platforms.join(', ') + '.');
   }
 
   if (args.verbose) {
