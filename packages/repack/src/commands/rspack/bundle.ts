@@ -2,6 +2,7 @@ import type { Config } from '@react-native-community/cli-types';
 import { type Configuration, rspack } from '@rspack/core';
 import type { Stats } from '@rspack/core';
 import { VERBOSE_ENV_KEY } from '../../env.js';
+import { exitWithError } from '../common/exit.js';
 import {
   getEnvOptions,
   getRspackConfigFilePath,
@@ -45,7 +46,9 @@ export async function bundle(
   };
 
   if (!args.entryFile) {
-    throw new Error("Option '--entry-file <path>' argument is missing");
+    exitWithError(
+      "Option '--entry-file <path>' argument is missing. Please provide a valid entry file path."
+    );
   }
 
   if (args.verbose) {
@@ -57,8 +60,7 @@ export async function bundle(
 
   const errorHandler = async (error: Error | null, stats?: Stats) => {
     if (error) {
-      console.error(error);
-      process.exit(2);
+      exitWithError(String(error));
     }
 
     if (stats?.hasErrors()) {
@@ -82,8 +84,7 @@ export async function bundle(
           rootDir: compiler.context,
         });
       } catch (e) {
-        console.error(String(e));
-        process.exit(2);
+        exitWithError(String(e));
       }
     }
   };

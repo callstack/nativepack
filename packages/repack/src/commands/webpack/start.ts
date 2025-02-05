@@ -12,6 +12,7 @@ import {
   composeReporters,
   makeLogEntryFromFastifyLog,
 } from '../../logging/index.js';
+import { exitWithError } from '../common/exit.js';
 import {
   getMimeType,
   getWebpackConfigFilePath,
@@ -63,7 +64,7 @@ export async function start(_: string[], config: Config, args: StartArguments) {
   };
 
   if (args.platform && !cliOptions.config.platforms.includes(args.platform)) {
-    throw new Error('Unrecognized platform: ' + args.platform);
+    exitWithError('Unrecognized platform: ' + args.platform);
   }
 
   if (args.verbose) {

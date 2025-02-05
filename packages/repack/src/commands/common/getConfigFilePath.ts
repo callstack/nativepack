@@ -6,6 +6,7 @@ import {
   DEFAULT_RSPACK_CONFIG_LOCATIONS,
   DEFAULT_WEBPACK_CONFIG_LOCATIONS,
 } from '../consts.js';
+import { exitWithError } from './exit.js';
 
 function getConfigFilePath(root: string, candidates: string[]) {
   for (const candidate of candidates) {
@@ -21,7 +22,7 @@ function getConfigFilePath(root: string, candidates: string[]) {
     }
   }
 
-  throw new Error('Cannot find configuration file');
+  exitWithError('Cannot find configuration file');
 }
 
 export function getWebpackConfigFilePath(root: string, customPath?: string) {
@@ -32,7 +33,7 @@ export function getWebpackConfigFilePath(root: string, customPath?: string) {
   try {
     return getConfigFilePath(root, candidates);
   } catch {
-    throw new Error('Cannot find Webpack configuration file');
+    exitWithError('Cannot find Webpack configuration file');
   }
 }
 
@@ -44,6 +45,6 @@ export function getRspackConfigFilePath(root: string, customPath?: string) {
   try {
     return getConfigFilePath(root, candidates);
   } catch {
-    throw new Error('Cannot find Rspack configuration file');
+    exitWithError('Cannot find Rspack configuration file');
   }
 }
