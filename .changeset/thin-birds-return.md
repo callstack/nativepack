@@ -2,4 +2,4 @@
 "@callstack/repack": patch
 ---
 
-Improve error handling
+Improve error handling by hiding useless stack traces.
