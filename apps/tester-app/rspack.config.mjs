@@ -95,10 +95,7 @@ export default (env) => {
           ],
           use: {
             loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-            },
+            options: { platform },
           },
         },
         {
@@ -120,10 +117,7 @@ export default (env) => {
           include: [path.join(context, 'src/assetsTest/localAssets')],
           use: {
             loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-            },
+            options: { platform },
           },
         },
         {
@@ -133,11 +127,7 @@ export default (env) => {
           include: [path.join(context, 'src/assetsTest/inlineAssets')],
           use: {
             loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-              inline: true,
-            },
+            options: { platform, inline: true },
           },
         },
         {
@@ -149,7 +139,6 @@ export default (env) => {
             loader: '@callstack/repack/assets-loader',
             options: {
               platform,
-              devServerEnabled: Boolean(devServer),
               remote: {
                 enabled: true,
                 publicPath: 'http://localhost:9999/remote-assets',
@@ -173,7 +162,6 @@ export default (env) => {
         context,
         mode,
         platform,
-        devServer,
         output: {
           bundleFilename,
           sourceMapFilename,

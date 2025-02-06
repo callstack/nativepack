@@ -5,9 +5,9 @@ import url from 'node:url';
 import {
   DEFAULT_RSPACK_CONFIG_LOCATIONS,
   DEFAULT_WEBPACK_CONFIG_LOCATIONS,
-} from '../consts.js';
+} from '../../consts.js';
 
-function getConfigFilePath(root: string, candidates: string[]) {
+function discoverConfigFilePath(root: string, candidates: string[]) {
   for (const candidate of candidates) {
     const filename = path.isAbsolute(candidate)
       ? candidate
@@ -24,26 +24,39 @@ function getConfigFilePath(root: string, candidates: string[]) {
   throw new Error('Cannot find configuration file');
 }
 
-export function getWebpackConfigFilePath(root: string, customPath?: string) {
+function getWebpackConfigFilePath(root: string, customPath?: string) {
   const candidates = customPath
     ? [customPath]
     : DEFAULT_WEBPACK_CONFIG_LOCATIONS;
 
   try {
-    return getConfigFilePath(root, candidates);
+    return discoverConfigFilePath(root, candidates);
   } catch {
     throw new Error('Cannot find Webpack configuration file');
   }
 }
 
-export function getRspackConfigFilePath(root: string, customPath?: string) {
+function getRspackConfigFilePath(root: string, customPath?: string) {
   const candidates = customPath
     ? [customPath]
     : DEFAULT_RSPACK_CONFIG_LOCATIONS;
 
   try {
-    return getConfigFilePath(root, candidates);
+    return discoverConfigFilePath(root, candidates);
   } catch {
     throw new Error('Cannot find Rspack configuration file');
+  }
+}
+
+export function getConfigFilePath(
+  bundler: 'rspack' | 'webpack',
+  root: string,
+  customPath?: string
+) {
+  switch (bundler) {
+    case 'rspack':
+      return getRspackConfigFilePath(root, customPath);
+    case 'webpack':
+      return getWebpackConfigFilePath(root, customPath);
   }
 }

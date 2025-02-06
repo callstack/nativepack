@@ -94,7 +94,8 @@
     "react-refresh": "^0.14.0",
     "schema-utils": "^4.2.0",
     "shallowequal": "^1.1.0",
-    "throttleit": "^2.1.0"
+    "throttleit": "^2.1.0",
+    "webpack-merge": "^6.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.25.2",

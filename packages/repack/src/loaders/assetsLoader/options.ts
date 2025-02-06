@@ -1,16 +1,11 @@
 import type { LoaderContext } from '@rspack/core';
 import { validate } from 'schema-utils';
 
-/**
- * Note: devServer enabled can be inferred from loader context:
- *       - we can access this.mode & this.hot
- * Note: publicPath could be obtained from webpack config in the future
- */
+// Note: publicPath could be obtained from webpack config in the future
 export interface AssetLoaderOptions {
   platform: string;
   scalableAssetExtensions?: string[];
   scalableAssetResolutions?: string[];
-  devServerEnabled?: boolean;
   inline?: boolean;
   publicPath?: string;
   remote?: {
@@ -43,7 +38,6 @@ export const optionsSchema: Schema = {
       type: 'array',
     },
     inline: { type: 'boolean' },
-    devServerEnabled: { type: 'boolean' },
     publicPath: { type: 'string' },
     remote: {
       type: 'object',

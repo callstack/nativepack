@@ -137,10 +137,7 @@ export default (env) => {
           test: Repack.getAssetExtensionsRegExp(Repack.ASSET_EXTENSIONS),
           use: {
             loader: '@callstack/repack/assets-loader',
-            options: {
-              platform,
-              devServerEnabled: Boolean(devServer),
-            },
+            options: { platform },
           },
         },
       ],
@@ -159,7 +156,6 @@ export default (env) => {
         context,
         mode,
         platform,
-        devServer,
         output: {
           bundleFilename,
           sourceMapFilename,

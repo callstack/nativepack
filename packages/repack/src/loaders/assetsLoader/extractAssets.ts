@@ -14,7 +14,7 @@ export function extractAssets(
     assetsDirname,
     pathSeparatorRegexp,
     publicPath: customPublicPath,
-    devServerEnabled,
+    isDev,
   }: {
     resourcePath: string;
     resourceDirname: string;
@@ -25,7 +25,7 @@ export function extractAssets(
     assetsDirname: string;
     pathSeparatorRegexp: RegExp;
     publicPath?: string;
-    devServerEnabled?: boolean;
+    isDev?: boolean;
   },
   logger: {
     debug: (...args: string[]) => void;
@@ -64,11 +64,7 @@ export function extractAssets(
       type: ${JSON.stringify(resourceExtensionType)},
       hash: ${JSON.stringify(hashes.join())},
       httpServerLocation: ${JSON.stringify(publicPath)},
-      ${
-        devServerEnabled
-          ? `fileSystemLocation: ${JSON.stringify(resourceDirname)},`
-          : ''
-      }
+      ${isDev ? `fileSystemLocation: ${JSON.stringify(resourceDirname)},` : ''}
       ${size ? `height: ${size.height},` : ''}
       ${size ? `width: ${size.width},` : ''}
     });

@@ -11,6 +11,7 @@ import multipartPlugin from './plugins/multipart/multipartPlugin.js';
 import symbolicatePlugin from './plugins/symbolicate/sybmolicatePlugin.js';
 import wssPlugin from './plugins/wss/wssPlugin.js';
 import { Internal, type Server } from './types.js';
+import { normalizeOptions } from './utils/normalizeOptions.js';
 
 /**
  * Create instance of development server, powered by Fastify.
@@ -22,9 +23,11 @@ export async function createServer(config: Server.Config) {
   // biome-ignore lint/style/useConst: needed in fastify constructor
   let delegate: Server.Delegate;
 
+  const options = normalizeOptions(config.options);
+
   /** Fastify instance powering the development server. */
   const instance = Fastify({
-    disableRequestLogging: !config.options.logRequests,
+    disableRequestLogging: options.disableRequestLogging,
     logger: {
       level: 'trace',
       stream: new Writable({
@@ -36,7 +39,7 @@ export async function createServer(config: Server.Config) {
         },
       }),
     },
-    ...(config.options.https ? { https: config.options.https } : undefined),
+    ...(options.https ? { https: options.https } : {}),
   });
 
   delegate = await config.delegate({
@@ -62,8 +65,8 @@ export async function createServer(config: Server.Config) {
   });
 
   const devMiddleware = createDevMiddleware({
-    projectRoot: config.options.rootDir,
-    serverBaseUrl: `http://${config.options.host}:${config.options.port}`,
+    projectRoot: options.rootDir,
+    serverBaseUrl: options.url,
     logger: instance.log,
     unstable_experiments: {
       // @ts-expect-error removed in 0.76, keep this for backkwards compatibility
@@ -75,11 +78,8 @@ export async function createServer(config: Server.Config) {
   await instance.register(fastifySensible);
   await instance.register(middie);
   await instance.register(wssPlugin, {
-    options: {
-      ...config.options,
-      endpoints: devMiddleware.websocketEndpoints,
-    },
     delegate,
+    endpoints: devMiddleware.websocketEndpoints,
   });
   await instance.register(multipartPlugin);
   await instance.register(apiPlugin, {
@@ -90,7 +90,7 @@ export async function createServer(config: Server.Config) {
     delegate,
   });
   await instance.register(devtoolsPlugin, {
-    options: config.options,
+    rootDir: options.rootDir,
   });
   await instance.register(symbolicatePlugin, {
     delegate,
@@ -102,7 +102,7 @@ export async function createServer(config: Server.Config) {
 
   instance.addHook('onSend', async (request, reply, payload) => {
     reply.header('X-Content-Type-Options', 'nosniff');
-    reply.header('X-React-Native-Project-Root', config.options.rootDir);
+    reply.header('X-React-Native-Project-Root', options.rootDir);
 
     const [pathname] = request.url.split('?');
     if (pathname.endsWith('.map')) {
@@ -122,8 +122,8 @@ export async function createServer(config: Server.Config) {
   /** Start the development server. */
   async function start() {
     await instance.listen({
-      port: config.options.port,
-      host: config.options.host,
+      port: options.port,
+      host: options.host,
     });
   }
 

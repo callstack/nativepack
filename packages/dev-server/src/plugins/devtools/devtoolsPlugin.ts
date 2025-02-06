@@ -4,18 +4,17 @@ import {
 } from '@react-native-community/cli-server-api';
 import type { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import type { Server } from '../../types.js';
 
 async function devtoolsPlugin(
   instance: FastifyInstance,
-  { options }: { options: Server.Options }
+  { rootDir }: { rootDir: string }
 ) {
   instance.use('/open-url', openURLMiddleware);
 
   instance.use(
     '/open-stack-frame',
     openStackFrameInEditorMiddleware({
-      watchFolders: [options.rootDir],
+      watchFolders: [rootDir],
     })
   );
 

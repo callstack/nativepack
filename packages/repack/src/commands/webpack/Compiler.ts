@@ -8,7 +8,7 @@ import type webpack from 'webpack';
 import { WORKER_ENV_KEY } from '../../env.js';
 import type { LogType, Reporter } from '../../logging/types.js';
 import { DEV_SERVER_ASSET_TYPES } from '../consts.js';
-import type { CliOptions } from '../types.js';
+import type { StartArguments } from '../types.js';
 import type {
   CompilerAsset,
   WebpackWorkerOptions,
@@ -26,8 +26,10 @@ export class Compiler extends EventEmitter {
   isCompilationInProgress: Record<Platform, boolean> = {};
 
   constructor(
-    private cliOptions: CliOptions,
-    private reporter: Reporter
+    private args: StartArguments,
+    private reporter: Reporter,
+    private rootDir: string,
+    private reactNativePath: string
   ) {
     super();
   }
@@ -36,8 +38,10 @@ export class Compiler extends EventEmitter {
     this.isCompilationInProgress[platform] = true;
 
     const workerData: WebpackWorkerOptions = {
-      cliOptions: this.cliOptions,
       platform,
+      args: this.args,
+      rootDir: this.rootDir,
+      reactNativePath: this.reactNativePath,
     };
 
     const worker = new Worker(path.join(__dirname, './CompilerWorker.js'), {
@@ -219,7 +223,7 @@ export class Compiler extends EventEmitter {
     }
 
     try {
-      const filePath = path.join(this.cliOptions.config.root, filename);
+      const filePath = path.join(this.rootDir, filename);
       const source = await fs.promises.readFile(filePath, 'utf8');
       return source;
     } catch {

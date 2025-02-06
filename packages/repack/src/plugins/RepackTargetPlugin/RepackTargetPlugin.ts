@@ -10,13 +10,6 @@ type RspackRuntimeModule = Parameters<
 >[0];
 
 /**
- * {@link RepackTargetPlugin} configuration options.
- */
-export interface RepackTargetPluginConfig {
-  hmr?: boolean;
-}
-
-/**
  * Plugin for tweaking the JavaScript runtime code to account for React Native environment.
  *
  * Globally available APIs differ with React Native and other target's like Web, so there are some
@@ -25,13 +18,6 @@ export interface RepackTargetPluginConfig {
  * @category Webpack Plugin
  */
 export class RepackTargetPlugin implements RspackPluginInstance {
-  /**
-   * Constructs new `RepackTargetPlugin`.
-   *
-   * @param config Plugin configuration options.
-   */
-  constructor(private config: RepackTargetPluginConfig) {}
-
   replaceRuntimeModule(
     module: RspackRuntimeModule | WebpackRuntimeModule,
     content: string
@@ -127,7 +113,7 @@ export class RepackTargetPlugin implements RspackPluginInstance {
               compiler,
               {
                 chunkId: chunk.id ?? undefined,
-                hmrEnabled: this.config.hmr ?? false,
+                hmrEnabled: !!compiler.options.devServer?.hot,
               }
             );
 

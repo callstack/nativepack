@@ -1,4 +1,5 @@
 import type { Config } from '@react-native-community/cli-types';
+import type { Configuration } from '@rspack/core';
 import * as colorette from 'colorette';
 import packageJson from '../../../package.json';
 import { VERBOSE_ENV_KEY } from '../../env.js';
@@ -9,15 +10,14 @@ import {
   composeReporters,
   makeLogEntryFromFastifyLog,
 } from '../../logging/index.js';
+import { makeCompilerConfig } from '../common/config/makeCompilerConfig.js';
 import {
   getMimeType,
-  getRspackConfigFilePath,
   parseFileUrl,
   runAdbReverse,
   setupInteractions,
 } from '../common/index.js';
-import { DEFAULT_HOSTNAME, DEFAULT_PORT } from '../consts.js';
-import type { StartArguments, StartCliOptions } from '../types.js';
+import type { StartArguments } from '../types.js';
 import { Compiler } from './Compiler.js';
 
 /**
@@ -37,34 +37,31 @@ export async function start(
   cliConfig: Config,
   args: StartArguments
 ) {
-  const rspackConfigPath = getRspackConfigFilePath(
-    cliConfig.root,
-    args.config ?? args.webpackConfig
-  );
-  const { reversePort, ...restArgs } = args;
+  const detectedPlatforms = Object.keys(cliConfig.platforms);
 
-  const serverProtocol = args.https ? 'https' : 'http';
-  const serverHost = args.host || DEFAULT_HOSTNAME;
-  const serverPort = args.port ?? DEFAULT_PORT;
-  const serverURL = `${serverProtocol}://${serverHost}:${serverPort}`;
-  const showHttpRequests = args.verbose || args.logRequests;
-
-  const cliOptions: StartCliOptions = {
-    config: {
-      root: cliConfig.root,
-      platforms: Object.keys(cliConfig.platforms),
-      bundlerConfigPath: rspackConfigPath,
-      reactNativePath: cliConfig.reactNativePath,
-    },
-    command: 'start',
-    arguments: {
-      start: { ...restArgs, host: serverHost, port: serverPort },
-    },
-  };
-
-  if (args.platform && !cliOptions.config.platforms.includes(args.platform)) {
+  if (args.platform && !detectedPlatforms.includes(args.platform)) {
     throw new Error('Unrecognized platform: ' + args.platform);
   }
+
+  const configs = await makeCompilerConfig<Configuration>({
+    args: args,
+    bundler: 'rspack',
+    command: 'start',
+    rootDir: cliConfig.root,
+    platforms: args.platform ? [args.platform] : detectedPlatforms,
+    reactNativePath: cliConfig.reactNativePath,
+  });
+
+  const devServerOptions = configs[0].devServer ?? {};
+
+  const serverProtocol =
+    typeof devServerOptions.server === 'string'
+      ? devServerOptions.server
+      : devServerOptions.server?.type;
+  const serverHost = devServerOptions.host!;
+  const serverPort = devServerOptions.port!;
+  const serverURL = `${serverProtocol}://${serverHost}:${serverPort}`;
+  const showHttpRequests = args.verbose || args.logRequests;
 
   if (args.verbose) {
     process.env[VERBOSE_ENV_KEY] = '1';
@@ -82,21 +79,13 @@ export async function start(
     colorette.bold(colorette.cyan('📦 Re.Pack ' + version + '\n\n'))
   );
 
-  // @ts-ignore
-  const compiler = new Compiler(cliOptions, reporter);
+  const compiler = new Compiler(configs, reporter, cliConfig.root);
 
   const { createServer } = await import('@callstack/repack-dev-server');
   const { start, stop } = await createServer({
     options: {
-      rootDir: cliOptions.config.root,
-      host: serverHost,
-      port: serverPort,
-      https: args.https
-        ? {
-            cert: args.cert,
-            key: args.key,
-          }
-        : undefined,
+      ...devServerOptions,
+      rootDir: cliConfig.root,
       logRequests: showHttpRequests,
     },
     delegate: (ctx) => {
@@ -128,7 +117,7 @@ export async function start(
         );
       }
 
-      if (reversePort) {
+      if (args.reversePort) {
         void runAdbReverse({ logger: ctx.log, port: serverPort, wait: true });
       }
 
@@ -196,9 +185,7 @@ export async function start(
     },
   });
 
-  await compiler.init();
   await start();
-
   compiler.start();
 
   return {

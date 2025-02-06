@@ -1,3 +1,5 @@
+/// <reference path="types/dev-server-options.d.ts" />
+
 import type { StatsCompilation } from '@rspack/core';
 
 export type Rule = string | RegExp;
@@ -18,7 +20,7 @@ export interface DevServerOptions {
    *
    * See: {@link DEFAULT_PORT}.
    */
-  port: number;
+  port?: number;
 
   /**
    * HTTPS options.
@@ -43,14 +45,14 @@ export interface DevServerOptions {
  * This is the return type of {@link parseCliOptions}.
  */
 export interface EnvOptions {
+  /** Context in which all resolution happens. Usually it's project root directory. */
+  context: string;
+
   /** Compilation mode. */
   mode?: 'production' | 'development';
 
   /** Target application platform. */
   platform?: string;
-
-  /** Context in which all resolution happens. Usually it's project root directory. */
-  context?: string;
 
   /** Input filename - entry point of the bundle. */
   entry?: string;
@@ -69,9 +71,6 @@ export interface EnvOptions {
   /** Whether to minimize the final bundle. */
   minimize?: boolean;
 
-  /** Path to React Native dependency. Usually points to `node_modules/react-native`. */
-  reactNativePath?: string;
-
   /**
    * Development server configuration options.
    * Used to configure `@callstack/repack-dev-server`.
@@ -79,6 +78,9 @@ export interface EnvOptions {
    * If `undefined`, then development server should not be run.
    */
   devServer?: DevServerOptions;
+
+  /** Path to React Native dependency. Usually points to `node_modules/react-native`. */
+  reactNativePath: string;
 }
 
 export interface HMRMessageBody {
