@@ -91,8 +91,6 @@ export class ChunksToHermesBytecodePlugin implements RspackPluginInstance {
      * ones present in build directory, which might result in transformation being
      * skipped when there is a untransformed bundle present in the build directory.
      */
-    // TODO Verify if this is still needed, maybe we can skip this
-    // @ts-expect-error compareBeforeEmit does not exist in rspack
     compiler.options.output.compareBeforeEmit = !!this.config.compareBeforeEmit;
 
     const reactNativePath =

@@ -1,9 +1,11 @@
 import type { StatsAsset, StatsCompilation } from 'webpack';
-import type { CliOptions, RemoveRecord } from '../types.js';
+import type { RemoveRecord, StartArguments } from '../types.js';
 
 export interface WebpackWorkerOptions {
-  cliOptions: CliOptions;
   platform: string;
+  args: StartArguments;
+  rootDir: string;
+  reactNativePath: string;
 }
 
 export interface HMRMessageBody {

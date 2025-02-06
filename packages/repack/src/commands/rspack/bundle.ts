@@ -2,14 +2,9 @@ import type { Config } from '@react-native-community/cli-types';
 import { type Configuration, rspack } from '@rspack/core';
 import type { Stats } from '@rspack/core';
 import { VERBOSE_ENV_KEY } from '../../env.js';
-import {
-  getEnvOptions,
-  getRspackConfigFilePath,
-  loadConfig,
-  normalizeStatsOptions,
-  writeStats,
-} from '../common/index.js';
-import type { BundleArguments, BundleCliOptions } from '../types.js';
+import { makeCompilerConfig } from '../common/config/makeCompilerConfig.js';
+import { normalizeStatsOptions, writeStats } from '../common/index.js';
+import type { BundleArguments } from '../types.js';
 
 /**
  * Bundle command for React Native Community CLI.
@@ -28,36 +23,18 @@ export async function bundle(
   cliConfig: Config,
   args: BundleArguments
 ) {
-  if (args.webpackConfig) {
-    console.warn(
-      'Warning: `--webpackConfig` option is deprecated and will be removed in the next major version. ' +
-        'Please use `--config` instead.'
-    );
-    args.config = args.webpackConfig;
-  }
-
-  const rspackConfigPath = getRspackConfigFilePath(
-    cliConfig.root,
-    args.config ?? args.webpackConfig
-  );
-
-  const cliOptions: BundleCliOptions = {
-    config: {
-      root: cliConfig.root,
-      platforms: Object.keys(cliConfig.platforms),
-      bundlerConfigPath: rspackConfigPath,
-      reactNativePath: cliConfig.reactNativePath,
-    },
+  const [config] = await makeCompilerConfig<Configuration>({
+    args: args,
+    bundler: 'rspack',
     command: 'bundle',
-    arguments: { bundle: args },
-  };
+    rootDir: cliConfig.root,
+    platforms: [args.platform],
+    reactNativePath: cliConfig.reactNativePath,
+  });
 
   if (args.verbose) {
     process.env[VERBOSE_ENV_KEY] = '1';
   }
-
-  const envOptions = getEnvOptions(cliOptions);
-  const config = await loadConfig<Configuration>(rspackConfigPath, envOptions);
 
   if (!args.entryFile && !config.entry) {
     throw new Error("Option '--entry-file <path>' argument is missing");
