@@ -10,6 +10,12 @@ export const FLOW_TYPED_MODULES_LOADING_RULES: RuleSetRule = {
   type: 'javascript/auto',
   test: /\.jsx?$/,
   include: getModulePaths([
+    'react-native',
+    '@react-native',
+    'react-native-macos',
+    'react-native-windows',
+    'react-native-tvos',
+    '@callstack/react-native-visionos',
     'react-native-blob-util',
     'react-native-pdf',
     '@react-native-picker/picker',
