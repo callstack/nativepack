@@ -1,0 +1,123 @@
+import { PackageManagerTabs, Steps, Tabs, Tab } from 'rspress/theme';
+
+# Manual installation
+
+If the [automatic installation](/docs/getting-started/quick-start) didn't work for any reason, or if you have custom project structure, you can follow these manual installation steps:
+
+### 1. Dependencies
+
+Install required dependencies in your project:
+
+<Tabs groupId="bundler">
+  <Tab label="Rspack" value="rspack">
+    <PackageManagerTabs command="install -D @rspack/core @swc/helpers @callstack/repack" />
+
+    This will install latest versions of Rspack, Re.Pack and dependencies used in Rspack config: `@swc/helpers` for minification.
+  </Tab>
+  <Tab label="Webpack" value="webpack">
+    <PackageManagerTabs command="install -D webpack terser-webpack-plugin @callstack/repack" />
+
+    This will install latest versions of Webpack, Re.Pack and dependencies used in Webpack config: `terser-webpack-plugin` for minification.
+  </Tab>
+</Tabs>
+
+Once the dependencies are installed, you need to tell React Native Community CLI to add Re.Pack's commands.
+
+### 2. Commands
+
+Add the following content to `react-native.config.js` (or create it if it doesn't exist):
+
+<Tabs groupId="bundler">
+  <Tab label="Rspack" value="rspack">
+    ```js title="react-native.config.js"
+    module.exports = {
+      commands: require('@callstack/repack/commands/rspack'),
+    };
+    ```
+  </Tab>
+  <Tab label="Webpack" value="webpack">
+    ```js title="react-native.config.js"
+    module.exports = {
+      commands: require('@callstack/repack/commands/webpack'),
+    };
+    ```
+  </Tab>
+</Tabs>
+
+This will allow you to use Re.Pack when running `react-native start` and `react-native bundle` commands.
+
+### 3. Configuration
+
+<Tabs groupId="bundler">
+  <Tab label="Rspack" value="rspack">
+    Create file `rspack.config.mjs` in the root directory of your project and paste the content from our [Rspack config template](https://github.com/callstack/repack/blob/main/templates_v5/rspack.config.mjs).
+  </Tab>
+  <Tab label="Webpack" value="webpack">
+    Create file `webpack.config.mjs` in the root directory of your project and paste the content from our [Webpack config template](https://github.com/callstack/repack/blob/main/templates_v5/webpack.config.mjs).
+  </Tab>
+</Tabs>
+
+:::info
+
+We recommend to use ESM version of Webpack config with the `.mjs` extension. However, Re.Pack also supports ESM under `.js` and CJS variant under `.js` and `.cjs` extensions. Check our [templates](https://github.com/callstack/repack/blob/main/templates_v5/) for CJS and ESM variants as well as the documentation on [Configuration](/docs/guides/configuration) to see the list of all available Webpack config location and extensions.
+
+:::
+
+### 4. Configure XCode
+
+When building release version of your application XCode project will still use Metro to bundle the application, so you need to adjust build settings to make XCode use Re.Pack instead.
+
+Open your application's Xcode project/workspace and:
+
+1. Click on the project in **_Project navigator_** panel on the left
+2. Go to **_Build Phases_** tab
+3. Expand **_Bundle React Native code and images_** phase
+4. Add following content to the phase:
+
+```bash
+if [[ -f "$PODS_ROOT/../.xcode.env" ]]; then
+source "$PODS_ROOT/../.xcode.env"
+fi
+if [[ -f "$PODS_ROOT/../.xcode.env.local" ]]; then
+source "$PODS_ROOT/../.xcode.env.local"
+fi
+
+export CLI_PATH="$("$NODE_BINARY" --print "require('path').dirname(require.resolve('@react-native-community/cli/package.json')) + '/build/bin.js'")"
+```
+
+After the change, the content of this phase should look similar to:
+
+```bash title="Bundle React Native code and images" {6-13}
+set -e
+
+WITH_ENVIRONMENT="$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh"
+REACT_NATIVE_XCODE="$REACT_NATIVE_PATH/scripts/react-native-xcode.sh"
+
+if [[ -f "$PODS_ROOT/../.xcode.env" ]]; then
+source "$PODS_ROOT/../.xcode.env"
+fi
+if [[ -f "$PODS_ROOT/../.xcode.env.local" ]]; then
+source "$PODS_ROOT/../.xcode.env.local"
+fi
+
+export CLI_PATH="$("$NODE_BINARY" --print "require('path').dirname(require.resolve('@react-native-community/cli/package.json')) + '/build/bin.js'")"
+
+/bin/sh -c "$WITH_ENVIRONMENT $REACT_NATIVE_XCODE"
+```
+
+### 5. Install CocoaPods dependencies
+
+For iOS development, you need to install CocoaPods dependencies. From the project root directory run:
+
+```bash
+npx pod-install
+```
+
+This will install all the necessary iOS dependencies for your project, including the Re.Pack native module.
+
+<b>🎉 Congratulations! You've successfully set up Re.Pack in your project. You can now:</b>
+
+- Learn more about [Micro Frontends](/docs/getting-started/microfrontends)
+- Explore [Module Federation](/docs/features/module-federation)
+- Check out [Configuration Guide](/docs/guides/configuration)
+- Browse [API Reference](/api)
