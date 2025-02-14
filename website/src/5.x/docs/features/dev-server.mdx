@@ -1,0 +1,47 @@
+# DevServer
+
+Re.Pack 5 has it's own dev server that contain all features as Metro packager does, or even more in some cases.
+
+## Usage
+
+To start the dev server, you can use the following command:
+
+import { PackageManagerTabs } from 'rspress/theme';
+
+<PackageManagerTabs command={{
+  npm: "npm run react-native start",
+  yarn: "yarn react-native start",
+  pnpm: "pnpm react-native start",
+  bun: "bun react-native start",
+}} />
+
+To get the full list of options available, check out the [`start`](/api/cli/start.md)'s command documentation.
+
+:::info
+
+The command is started through the React Native Community CLI's `start` command, which is overridden [inside `react-native.config.js`](../getting-started/quick-start.mdx#2-commands) to spawn Re.Pack's dev server.
+
+:::
+
+## Features
+
+Re.Pack's dev server supports both Rspack and webpack and provides essential development features:
+
+- **Fast Bundling**: Uses Rspack/webpack for efficient JavaScript bundling
+- **Hot Reloading**: Instantly reflects code changes in the app
+- **Source Maps**: Enables proper debugging with source code mapping
+- **Multiple Platforms**: Supports both iOS and Android development
+- **Module Federation**: Enables dynamic loading of remote modules
+- **Development Tools**: Integrated with React Native DevTools
+- **Asset Management**: Handles images, fonts and other assets
+
+## Keyboard shortcuts
+
+You can use various keyboard shortcuts inside a terminal to interact with the dev server.
+
+| Key | Description |
+| -------- | ----------- |
+| `r` | Reloads the app on connected device/simulator |
+| `d` | Opens the developer menu (same as shaking device) |
+| `j` | Opens the [React Native DevTools](./devtools.md) for debugging and profiling |
+| `a` | Runs `adb reverse` to enable communication between Android device and dev server |
